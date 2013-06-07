@@ -16,6 +16,8 @@ WHITE='\[\033[37m\]'
 # Bold
 BGreen="\[\033[1;32m\]"       # Green
 
+BCyan="\[\033[1;36m\]"		  # Cyan
+
 # High Intensty
 IBlack="\[\033[0;90m\]"       # Black
 
@@ -24,13 +26,14 @@ Magenta="\[\033[1;95m\]"     # Purple
 
 # Various variables you might want for your PS1 prompt instead
 Time12a="\@"
-PathShort="\w"
+PathShort="\h:$BCyan\W$ResetColor \u"
 
 # Default values for the appearance of the prompt. Configure at will.
 GIT_PROMPT_PREFIX="["
 GIT_PROMPT_SUFFIX="]"
 GIT_PROMPT_SEPARATOR="|"
 GIT_PROMPT_BRANCH="${Magenta}"
+GIT_PROMPT_BRANCH_MASTER="${Red}"
 GIT_PROMPT_STAGED="${Red}● "
 GIT_PROMPT_CONFLICTS="${Red}✖ "
 GIT_PROMPT_CHANGED="${Blue}✚ "
@@ -39,7 +42,7 @@ GIT_PROMPT_UNTRACKED="…"
 GIT_PROMPT_CLEAN="${BGreen}✔"
 
 PROMPT_START="$Yellow$PathShort$ResetColor"
-PROMPT_END=" \n$WHITE$Time12a$ResetColor $ "
+PROMPT_END="$WHITE$ResetColor$ "
 
 
 function update_current_git_vars() {
@@ -63,9 +66,12 @@ function update_current_git_vars() {
 function setGitPrompt() {
 	update_current_git_vars
 	set_virtualenv
-
 	if [ -n "$__CURRENT_GIT_STATUS" ]; then
-	  STATUS=" $GIT_PROMPT_PREFIX$GIT_PROMPT_BRANCH$GIT_BRANCH$ResetColor"
+	  if [ "$GIT_BRANCH" == "master" ]; then 
+	  	  STATUS=" $GIT_PROMPT_PREFIX$GIT_PROMPT_BRANCH_MASTER$GIT_BRANCH$ResetColor"
+	  else
+	  	  STATUS=" $GIT_PROMPT_PREFIX$GIT_PROMPT_BRANCH$GIT_BRANCH$ResetColor"
+	  fi
 
 	  if [ -n "$GIT_REMOTE" ]; then
 		  STATUS="$STATUS$GIT_PROMPT_REMOTE$GIT_REMOTE$ResetColor"
@@ -92,7 +98,7 @@ function setGitPrompt() {
 
 	  PS1="$PYTHON_VIRTUALENV$PROMPT_START$STATUS$PROMPT_END"
 	else
-	  PS1="$PROMPT_START$PROMPT_END"
+	  PS1="$PYTHON_VIRTUALENV$PathShort$ "
 	fi
 }
 
@@ -104,5 +110,4 @@ function set_virtualenv () {
       PYTHON_VIRTUALENV="${BLUE}(`basename \"$VIRTUAL_ENV\"`)${ResetColor} "
   fi
 }
-
 PROMPT_COMMAND=setGitPrompt
